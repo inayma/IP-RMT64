@@ -47,7 +47,7 @@ export default function HomePage() {
         console.error("❌ Failed to fetch posts:", error);
       }
     };
-    
+
     loadPosts();
   }, [dispatch]);
 
@@ -88,7 +88,7 @@ export default function HomePage() {
     // Ensure posts is always an array
     const postsArray = Array.isArray(posts) ? posts : [];
     const newsArray = Array.isArray(news) ? news : [];
-    
+
     const allItems = [
       ...postsArray.map((post) => ({ ...post, type: "post" })),
       ...newsArray.map((article) => ({ ...article, type: "news" })),
@@ -140,11 +140,11 @@ export default function HomePage() {
 
   // Debug logging
   console.log("🏠 HomePage Debug:", {
-    postsCount: Array.isArray(posts) ? posts.length : 'Not array',
+    postsCount: Array.isArray(posts) ? posts.length : "Not array",
     postsLoading,
     postsError,
     newsCount: news.length,
-    combinedItemsCount: combinedItems.length
+    combinedItemsCount: combinedItems.length,
   });
 
   // Loading state
@@ -215,7 +215,7 @@ export default function HomePage() {
           <div className="alert alert-danger" role="alert">
             <i className="bi bi-exclamation-triangle me-2"></i>
             Failed to load posts: {postsError}
-            <button 
+            <button
               className="btn btn-sm btn-outline-danger ms-2"
               onClick={handleRefresh}
               disabled={postsLoading}
@@ -242,7 +242,7 @@ export default function HomePage() {
                 : "Be the first to share tech news, or wait for latest news to load!"}
             </p>
             {postsError && (
-              <button 
+              <button
                 className="btn btn-primary mt-3"
                 onClick={handleRefresh}
                 disabled={postsLoading}
