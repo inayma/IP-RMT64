@@ -5,16 +5,10 @@ import NewsAPIService from "../../services/newsApiService";
 export const fetchTechHeadlines = createAsyncThunk(
   "news/fetchTechHeadlines",
   async (options = {}, { rejectWithValue }) => {
-    console.log(
-      "🔄 Redux: fetchTechHeadlines action dispatched with options:",
-      options
-    );
     try {
       const response = await NewsAPIService.getTechHeadlines(options);
-      console.log("✅ Redux: fetchTechHeadlines success:", response);
       return response;
     } catch (error) {
-      console.error("❌ Redux: fetchTechHeadlines error:", error);
       return rejectWithValue(error.message || "Failed to fetch tech headlines");
     }
   }

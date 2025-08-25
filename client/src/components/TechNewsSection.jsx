@@ -10,9 +10,13 @@ export default function TechNewsSection() {
     const fetchTechNews = async () => {
       try {
         setLoading(true);
-        const articles = await NewsAPIService.getTechHeadlines("us", 6);
+        const response = await NewsAPIService.getTechHeadlines({ limit: 6 });
+        // Handle the response structure from server: { status, totalResults, articles }
+        const articles = response.articles || response || [];
         setHeadlines(articles);
       } catch (err) {
+        console.error("Error fetching tech news:", err);
+        setError(err.message);
         // Fallback to mock data when news API fails
         const mockHeadlines = [
           {
@@ -106,59 +110,74 @@ export default function TechNewsSection() {
         </h5>
       </div>
       <div className="card-body">
+        {error && (
+          <div
+            className="alert alert-warning alert-dismissible fade show"
+            role="alert"
+          >
+            <i className="bi bi-exclamation-triangle me-2"></i>
+            Unable to fetch latest news. Showing sample content.
+            <button
+              type="button"
+              className="btn-close"
+              onClick={() => setError(null)}
+            ></button>
+          </div>
+        )}
         <div className="row">
-          {headlines.map((article, index) => (
-            <div key={index} className="col-md-6 mb-3">
-              <div className="card h-100 border-0 shadow-sm">
-                {article.urlToImage && (
-                  <img
-                    src={article.urlToImage}
-                    className="card-img-top"
-                    alt={article.title}
-                    style={{ height: "150px", objectFit: "cover" }}
-                    onError={(e) => {
-                      e.target.style.display = "none";
-                    }}
-                  />
-                )}
-                <div className="card-body p-3">
-                  <h6 className="card-title">
-                    <a
-                      href={article.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-decoration-none"
-                    >
-                      {article.title.length > 80
-                        ? `${article.title.substring(0, 80)}...`
-                        : article.title}
-                    </a>
-                  </h6>
-                  <p className="card-text small text-muted">
-                    {article.description && article.description.length > 100
-                      ? `${article.description.substring(0, 100)}...`
-                      : article.description || "No description available"}
-                  </p>
-                  <div className="d-flex justify-content-between align-items-center">
-                    <small className="text-muted">
-                      <i className="bi bi-person me-1"></i>
-                      NewsAPI
-                    </small>
-                    <small className="text-muted">
-                      <i className="bi bi-clock me-1"></i>
-                      {new Date(article.publishedAt).toLocaleDateString()}
-                    </small>
-                  </div>
-                  <div className="mt-1">
-                    <small className="text-muted">
-                      <i className="bi bi-building me-1"></i>
-                      Source: {article.source.name}
-                    </small>
+          {Array.isArray(headlines) &&
+            headlines.map((article, index) => (
+              <div key={index} className="col-md-6 mb-3">
+                <div className="card h-100 border-0 shadow-sm">
+                  {article.urlToImage && (
+                    <img
+                      src={article.urlToImage}
+                      className="card-img-top"
+                      alt={article.title}
+                      style={{ height: "150px", objectFit: "cover" }}
+                      onError={(e) => {
+                        e.target.style.display = "none";
+                      }}
+                    />
+                  )}
+                  <div className="card-body p-3">
+                    <h6 className="card-title">
+                      <a
+                        href={article.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-decoration-none"
+                      >
+                        {article.title.length > 80
+                          ? `${article.title.substring(0, 80)}...`
+                          : article.title}
+                      </a>
+                    </h6>
+                    <p className="card-text small text-muted">
+                      {article.description && article.description.length > 100
+                        ? `${article.description.substring(0, 100)}...`
+                        : article.description || "No description available"}
+                    </p>
+                    <div className="d-flex justify-content-between align-items-center">
+                      <small className="text-muted">
+                        <i className="bi bi-person me-1"></i>
+                        NewsAPI
+                      </small>
+                      <small className="text-muted">
+                        <i className="bi bi-clock me-1"></i>
+                        {new Date(article.publishedAt).toLocaleDateString()}
+                      </small>
+                    </div>
+                    <div className="mt-1">
+                      <small className="text-muted">
+                        <i className="bi bi-building me-1"></i>
+                        Source: {article.source.name}
+                      </small>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
         </div>
         <div className="text-center mt-3">
           <small className="text-muted">

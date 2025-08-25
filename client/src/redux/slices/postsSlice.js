@@ -1,12 +1,21 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { instance } from "../../libs/http";
+import {
+  getAllPosts,
+  getPostById,
+  createPost as createPostAPI,
+  updatePost as updatePostAPI,
+  deletePost as deletePostAPI,
+  votePost as votePostAPI,
+  getAvailableCategories,
+  getPostsByCategory,
+} from "../../libs/http";
 
 // Async thunks for posts
 export const fetchPosts = createAsyncThunk(
   "posts/fetchPosts",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await instance.get("/posts");
+      const response = await getAllPosts();
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -20,7 +29,7 @@ export const fetchPostById = createAsyncThunk(
   "posts/fetchPostById",
   async (postId, { rejectWithValue }) => {
     try {
-      const response = await instance.get(`/posts/${postId}`);
+      const response = await getPostById(postId);
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -34,7 +43,7 @@ export const createPost = createAsyncThunk(
   "posts/createPost",
   async (postData, { rejectWithValue }) => {
     try {
-      const response = await instance.post("/posts", postData);
+      const response = await createPostAPI(postData);
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -44,12 +53,43 @@ export const createPost = createAsyncThunk(
   }
 );
 
+export const fetchCategories = createAsyncThunk(
+  "posts/fetchCategories",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await getAvailableCategories();
+      return response.data.categories;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch categories"
+      );
+    }
+  }
+);
+
+export const fetchPostsByCategory = createAsyncThunk(
+  "posts/fetchPostsByCategory",
+  async ({ categoryName, page = 1, limit = 10 }, { rejectWithValue }) => {
+    try {
+      const response = await getPostsByCategory(categoryName, { page, limit });
+      return {
+        categoryName,
+        ...response.data,
+      };
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch posts by category"
+      );
+    }
+  }
+);
+
 export const updatePost = createAsyncThunk(
   "posts/updatePost",
   async ({ postId, postData }, { rejectWithValue }) => {
     try {
-      const response = await instance.put(`/posts/${postId}`, postData);
-      return response.data;
+      const response = await updatePostAPI(postId, postData);
+      return { postId, updatedPost: response.data.post };
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "Failed to update post"
@@ -62,7 +102,7 @@ export const deletePost = createAsyncThunk(
   "posts/deletePost",
   async (postId, { rejectWithValue }) => {
     try {
-      await instance.delete(`/posts/${postId}`);
+      await deletePostAPI(postId);
       return postId;
     } catch (error) {
       return rejectWithValue(
@@ -76,9 +116,7 @@ export const votePost = createAsyncThunk(
   "posts/votePost",
   async ({ postId, voteType }, { rejectWithValue }) => {
     try {
-      const response = await instance.post(`/posts/${postId}/vote`, {
-        voteType,
-      });
+      const response = await votePostAPI(postId, { voteType });
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Failed to vote");
@@ -89,7 +127,11 @@ export const votePost = createAsyncThunk(
 const initialState = {
   posts: [],
   currentPost: null,
+  categories: [],
+  postsByCategory: {},
+  selectedCategory: "all",
   isLoading: false,
+  categoriesLoading: false,
   error: null,
   pagination: {
     page: 1,
@@ -108,6 +150,12 @@ const postsSlice = createSlice({
     },
     clearCurrentPost: (state) => {
       state.currentPost = null;
+    },
+    setSelectedCategory: (state, action) => {
+      state.selectedCategory = action.payload;
+    },
+    clearPostsByCategory: (state) => {
+      state.postsByCategory = {};
     },
     setPagination: (state, action) => {
       state.pagination = { ...state.pagination, ...action.payload };
@@ -128,6 +176,35 @@ const postsSlice = createSlice({
         }
       })
       .addCase(fetchPosts.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      // Fetch Categories
+      .addCase(fetchCategories.pending, (state) => {
+        state.categoriesLoading = true;
+      })
+      .addCase(fetchCategories.fulfilled, (state, action) => {
+        state.categoriesLoading = false;
+        state.categories = action.payload;
+      })
+      .addCase(fetchCategories.rejected, (state, action) => {
+        state.categoriesLoading = false;
+        state.error = action.payload;
+      })
+      // Fetch Posts by Category
+      .addCase(fetchPostsByCategory.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchPostsByCategory.fulfilled, (state, action) => {
+        state.isLoading = false;
+        const { categoryName, posts, pagination } = action.payload;
+        state.postsByCategory[categoryName] = {
+          posts: posts || [],
+          pagination: pagination || {},
+        };
+      })
+      .addCase(fetchPostsByCategory.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       })
@@ -191,6 +268,11 @@ const postsSlice = createSlice({
   },
 });
 
-export const { clearError, clearCurrentPost, setPagination } =
-  postsSlice.actions;
+export const {
+  clearError,
+  clearCurrentPost,
+  setSelectedCategory,
+  clearPostsByCategory,
+  setPagination,
+} = postsSlice.actions;
 export default postsSlice.reducer;

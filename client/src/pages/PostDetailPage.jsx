@@ -9,8 +9,8 @@ import {
 } from "../redux/slices/postsSlice";
 import PageContainer from "../components/PageContainer";
 import LoadingSpinner from "../components/LoadingSpinner";
-import AIAnalysisTabs from "../components/AIAnalysisTabs";
 import CommentsCard from "../components/CommentsCard";
+import AIBriefSummary from "../components/AIBriefSummary";
 
 export default function PostDetailPage() {
   const { id } = useParams();
@@ -207,19 +207,8 @@ export default function PostDetailPage() {
             {/* Post Content */}
             <div className="mb-4">
               {post.summary && (
-                <div className="alert alert-info mb-3">
-                  <strong>AI Summary:</strong> {post.summary}
-                </div>
+                <AIBriefSummary summary={post.summary} isDetailView={true} />
               )}
-
-              {/* AI Analysis Section - Before article content */}
-              <div className="mb-4">
-                <AIAnalysisTabs
-                  postId={post.id}
-                  postTitle={post.title}
-                  postContent={post.description}
-                />
-              </div>
 
               <div
                 className="post-content"

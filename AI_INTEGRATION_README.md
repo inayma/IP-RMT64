@@ -1,6 +1,6 @@
 # WarTek (Warung Tekno) - AI-Powered Tech Community Platform
 
-A community-driven tech news and discussion website inspired by Reddit/Kaskus, enhanced with Google Gemini AI for intelligent content analysis.
+A community-driven tech news and discussion website inspired by Reddit, enhanced with Google Gemini AI for intelligent content analysis.
 
 ## 🚀 Features
 
@@ -16,26 +16,13 @@ A community-driven tech news and discussion website inspired by Reddit/Kaskus, e
 
 When viewing post details, users get access to three intelligent analysis tabs:
 
-1. **AI Summary Tab** 📝
+ **AI Summary** 📝
 
    - Concise, intelligent summaries of tech articles
    - Key points extraction for quick understanding
    - Perfect for busy professionals
 
-2. **5W1H Analysis Tab** ❓
 
-   - **Who**: Key people and companies involved
-   - **What**: Technology/product details
-   - **When**: Timeline and release dates
-   - **Where**: Market regions and availability
-   - **Why**: Business reasoning and market needs
-   - **How**: Technical implementation and features
-
-3. **Market Comparison Tab** 📊
-   - Competitive analysis with market leaders
-   - Industry ranking and positioning
-   - Strengths vs competitors
-   - Market share insights
 
 ## 🛠️ Tech Stack
 
@@ -197,27 +184,6 @@ gaming performance. The device maintains premium pricing while offering signific
 in durability and processing power.
 \`\`\`
 
-### 5W1H Tab Output
-
-\`\`\`
-WHO: Apple Inc., led by CEO Tim Cook and design team
-WHAT: iPhone 15 Pro with titanium construction, A17 Pro chip, USB-C port
-WHEN: Announced September 2023, available for pre-order September 15
-WHERE: Global launch in major markets, starting with US, Europe, Asia
-WHY: Competitive pressure, EU regulations, user demand for durability
-HOW: Advanced titanium machining, 3nm chip manufacturing, camera improvements
-\`\`\`
-
-### Market Comparison Tab Output
-
-\`\`\`
-MARKET POSITION: Premium tier leader (#1)
-KEY COMPETITORS: Samsung Galaxy S23 Ultra, Google Pixel 8 Pro
-ADVANTAGES: Superior ecosystem integration, longer software support, premium build
-DISADVANTAGES: Higher price point, limited customization vs Android
-MARKET SHARE: ~23% premium smartphone segment
-INDUSTRY RANKING: #1 in revenue, #2 in global shipments
-\`\`\`
 
 ## 🤝 Contributing
 

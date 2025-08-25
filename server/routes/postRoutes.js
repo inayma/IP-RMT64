@@ -6,6 +6,8 @@ const postAuthorization = require("../middlewares/postAuthorization");
 
 // Public
 router.get("/", PostController.getAll);
+router.get("/categories", PostController.getAvailableCategories);
+router.get("/category/:categoryName", PostController.getPostsByCategory);
 router.get("/:id", PostController.getById);
 
 // Protected (requires login)

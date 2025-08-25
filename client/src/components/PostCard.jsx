@@ -1,4 +1,5 @@
 import { Link } from "react-router";
+import AIBriefSummary from "./AIBriefSummary";
 
 export default function PostCard({ post, onVote }) {
   const handleUpvote = () => onVote(post.id, "up");
@@ -55,10 +56,7 @@ export default function PostCard({ post, onVote }) {
               </Link>
             </h5>
             {post.summary && (
-              <p className="card-text text-muted">
-                <i className="bi bi-robot me-1"></i>
-                <strong>AI Summary:</strong> {post.summary}
-              </p>
+              <AIBriefSummary summary={post.summary} isDetailView={false} />
             )}
             <p className="card-text">
               {post.description.length > 200

@@ -6,6 +6,7 @@ const port = 3000;
 
 const userRoutes = require("./routes/userRoutes");
 const postRoutes = require("./routes/postRoutes");
+const newsRoutes = require("./routes/newsRoutes");
 const aiRoutes = require("./routes/ai");
 const errorHandler = require("./middlewares/errorHandler");
 
@@ -27,6 +28,7 @@ app.use(express.json());
 // Routes
 app.use("/users", userRoutes);
 app.use("/posts", postRoutes);
+app.use("/news", newsRoutes);
 app.use("/ai", aiRoutes);
 
 app.get("/", (req, res) => {

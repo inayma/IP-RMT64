@@ -1,4 +1,6 @@
 const { Post, User, Vote } = require("../models");
+const { Op } = require("sequelize");
+const AutoCategorizationService = require("../services/autoCategorizationService");
 
 class PostController {
   static async getAll(req, res, next) {
@@ -79,14 +81,27 @@ class PostController {
   static async create(req, res, next) {
     try {
       const { title, description } = req.body;
+
+      // Auto-categorize the post based on content
+      const detectedCategories =
+        await AutoCategorizationService.categorizeContent(title, description);
+
       const post = await Post.create({
         title,
         description,
         votes: 0,
         userId: req.user.id,
+        categories: detectedCategories,
       });
 
-      res.status(201).json(post);
+      // Include category information in response
+      const postResponse = {
+        ...post.toJSON(),
+        detectedCategories,
+        autoCategories: true,
+      };
+
+      res.status(201).json(postResponse);
     } catch (error) {
       next(error);
     }
@@ -198,6 +213,78 @@ class PostController {
 
       await post.destroy();
       res.json({ message: "Post deleted successfully" });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // Get posts by category
+  static async getPostsByCategory(req, res, next) {
+    try {
+      const { categoryName } = req.params;
+      const { page = 1, limit = 10 } = req.query;
+
+      const offset = (page - 1) * limit;
+
+      // Find posts that have this category in their categories JSON array
+      const posts = await Post.findAndCountAll({
+        where: {
+          categories: {
+            [Op.like]: `%"name":"${categoryName}"%`,
+          },
+        },
+        include: [
+          {
+            model: User,
+            attributes: ["id", "username", "email", "picture"],
+          },
+          {
+            model: Vote,
+            attributes: ["value"],
+            separate: true,
+          },
+        ],
+        order: [["createdAt", "DESC"]],
+        limit: parseInt(limit),
+        offset: parseInt(offset),
+      });
+
+      // Calculate vote totals for each post
+      const postsWithVotes = posts.rows.map((post) => {
+        const votes = post.Votes || [];
+        const upvotes = votes.filter((vote) => vote.value === 1).length;
+        const downvotes = votes.filter((vote) => vote.value === -1).length;
+        const totalVotes = upvotes - downvotes;
+
+        return {
+          ...post.toJSON(),
+          votes: totalVotes,
+          upvotes,
+          downvotes,
+        };
+      });
+
+      res.json({
+        posts: postsWithVotes,
+        pagination: {
+          currentPage: parseInt(page),
+          totalPages: Math.ceil(posts.count / limit),
+          totalPosts: posts.count,
+          hasNext: page * limit < posts.count,
+          hasPrev: page > 1,
+        },
+        category: categoryName,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // Get available categories
+  static async getAvailableCategories(req, res, next) {
+    try {
+      const categories = AutoCategorizationService.getAvailableCategories();
+      res.json({ categories });
     } catch (error) {
       next(error);
     }

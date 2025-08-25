@@ -36,6 +36,15 @@ module.exports = (sequelize, DataTypes) => {
           isInt: { msg: "votes must be a number" },
         },
       },
+      categories: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      categories: {
+        type: DataTypes.JSON,
+        allowNull: true,
+        defaultValue: [],
+      },
       userId: {
         type: DataTypes.INTEGER,
         allowNull: false,

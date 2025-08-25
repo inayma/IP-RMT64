@@ -38,15 +38,37 @@ instance.interceptors.response.use(
   }
 );
 
-// AI Analysis API calls
+// Posts API calls
+export const getAllPosts = () => instance.get("/posts");
+export const getPostById = (id) => instance.get(`/posts/${id}`);
+export const createPost = (postData) => instance.post("/posts", postData);
+export const updatePost = (id, postData) =>
+  instance.put(`/posts/${id}`, postData);
+export const deletePost = (id) => instance.delete(`/posts/${id}`);
+export const votePost = (id, voteData) =>
+  instance.post(`/posts/${id}/vote`, voteData);
+
+// Category API calls
+export const getAvailableCategories = () => instance.get("/posts/categories");
+export const getPostsByCategory = (categoryName, params = {}) => {
+  const searchParams = new URLSearchParams(params);
+  return instance.get(`/posts/category/${categoryName}?${searchParams}`);
+};
+
+// News API calls (proxied through our server)
+export const getTechHeadlines = (params = {}) => {
+  const searchParams = new URLSearchParams(params);
+  return instance.get(`/news/tech-headlines?${searchParams}`);
+};
+export const getNewsByCategory = (category, params = {}) => {
+  const searchParams = new URLSearchParams(params);
+  return instance.get(`/news/category/${category}?${searchParams}`);
+};
+export const searchNews = (params = {}) => {
+  const searchParams = new URLSearchParams(params);
+  return instance.get(`/news/search?${searchParams}`);
+};
+
+// AI API calls
 export const generateSummary = (postId) =>
   instance.post(`/ai/posts/${postId}/summary`);
-
-export const generate5W1H = (postId) =>
-  instance.post(`/ai/posts/${postId}/5w1h`);
-
-export const generateComparison = (postId) =>
-  instance.post(`/ai/posts/${postId}/comparison`);
-
-export const generateAllAnalyses = (postId) =>
-  instance.post(`/ai/posts/${postId}/analyze-all`);
